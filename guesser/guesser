@@ -1,0 +1,73 @@
+import random
+
+class Guesser:
+    def __init__(self, num_range=(1, 10), guesses=4, hints=3):
+        self.range = num_range
+        self.number = random.randint(*num_range)
+        self.guesses = guesses
+        self.hints = hints
+
+    def hint(self):
+        if self.hints <= 0:
+            return "No hints left."
+        self.hints -= 1
+        choice = random.choice(["factor/multiple", "larger/smaller", "parity"])
+
+        if choice == "factor/multiple":
+            factors = [n for n in range(1, self.number) if self.number % n == 0]
+            multiples = [self.number * i for i in range(2, 6) if self.range[0] <= self.number * i <= self.range[1]]
+            if factors and multiples:
+                if random.choice([True, False]):
+                    return f"Hint: A factor is {random.choice(factors)}."
+                else:
+                    return f"Hint: A multiple is {random.choice(multiples)}."
+            elif factors:
+                return f"Hint: A factor is {random.choice(factors)}."
+            elif multiples:
+                return f"Hint: A multiple is {random.choice(multiples)}."
+            else:
+                return "No factors or multiples found — interesting!"
+
+        elif choice == "larger/smaller":
+            larger = [n for n in range(self.number + 1, self.range[1] + 1)]
+            smaller = [n for n in range(self.range[0], self.number)]
+            if larger and smaller:
+                return f"Hint: {'Larger' if random.choice([True, False]) else 'Smaller'} number is {random.choice(larger if random.choice([True, False]) else smaller)}."
+            elif larger:
+                return f"Hint: Larger number is {random.choice(larger)}."
+            elif smaller:
+                return f"Hint: Smaller number is {random.choice(smaller)}."
+            else:
+                return "No larger or smaller numbers — what could that mean?"
+
+        else:  # parity
+            return f"Hint: The number is {'even' if self.number % 2 == 0 else 'odd'}."
+
+def main():
+    game = Guesser()
+
+    print(f"I have chosen a number between {game.range[0]} and {game.range[1]}.")
+    print(f"You have {game.guesses} guesses and {game.hints} hints. Type 'hint' for a hint.")
+
+    while game.guesses > 0:
+        guess = input("Your guess: ").strip().lower()
+
+        if guess == "hint":
+            print(game.hint())
+        elif guess.isdigit():
+            guess = int(guess)
+            if guess == game.number:
+                print("You got it! 🎉")
+                return
+            else:
+                print("Wrong guess.")
+                game.guesses -= 1
+        else:
+            print("Invalid input.")
+
+        print(f"Guesses left: {game.guesses}, Hints left: {game.hints}")
+
+    print(f"Out of guesses! The number was {game.number}.")
+
+if __name__ == "__main__":
+    main()
